@@ -671,3 +671,320 @@ Como criar um repositório no GitHub;
 Como adicionar um repositório do GitHub como repositório remoto, utilizando o git remote add.
 
 
+@04-Trabalhando em equipe
+
+@@01
+Branches
+
+Sobre este trabalho compartilhado, temos dois usuários, Vinicius e Ana, desenvolvendo o mesmo projeto, e normalmente duas pessoas diferentes trabalham em partes diferentes de um projeto. Sabemos, no entanto, que este tal de master está sendo compartilhado entre eles, então, para evitarmos complicações e, enquanto o Vinicius estiver trabalhando no cabeçalho da página, por exemplo, e a Ana na lista de cursos, seria interessante termos uma maneira de separar os ramos de desenvolvimento para sabermos exatamente no que cada um está mexendo, e para que não haja interferências no código compartilhado.
+Talvez isto não tenha ficado tão claro, mas consideremos o seguinte: o Vinicius passará a trabalhar em tudo que estiver contido entre as tags <head> do arquivo index.html. Então, informaremos ao nosso controle de versões que, a partir de um determinado commit, um dos usuários alterará apenas um trecho específico, enquanto o outro usuário informará do seu trecho em desenvolvimento, também.
+
+Estas ramificações do trabalho são uma das formas de com que podemos trabalhar, em relação aos branches do Git. Por padrão, se executarmos git branch no Git Bash, teremos um único branch, master, e é exatamente isto que o Git Bash nos mostra ao fim da linha. No entanto, poderemos criar outros. No caso de trabalharmos somente no título, por exemplo, utilizaremos o comando git branch titulo, que criará este branch, embora tenhamos que mudar para ela manualmente, com git checkout titulo.
+
+A partir daí, estaremos trabalhando na linha de desenvolvimento titulo. Para isso ficar um pouco mais claro, utilizaremos uma ferramenta chamada Visualizing Git. Do lado esquerdo da página digitaremos os comandos, e o resultado destes serão exibidos do lado direito. Em se tratando do trabalho conjunto de Ana e Vinicius, teremos duas linhas de desenvolvimento distintas e independentes entre si.
+
+Abriremos o VS Code e alteraremos o título, de <title>Cursos da Alura</title> para <title>Cursos de DevOps da Alura</title>. No Git Bash, estamos logados como Vinicius, e em titulo. Executaremos git status, verificaremos que há uma alteração, que adicionaremos com git add index.html, seguido de git commit -m "Alterando título da página".
+
+Desta vez, se utilizarmos git log, dentre as informações que o comando nos traz, estão todos os commits realizados, incluindo o último, que é indicado como sendo o último commit realizado na master. O commit do título alterado só aparece na branch titulo, e se fizermos outra alteração no mesmo título, e refizermos todo o processo de adição, commit e verificação do log, teremos que até a mensagem "Renomeando curso de Integração Contínua" é feito na master.
+
+Assim, somente a branch titulo possui as alterações feitas a partir de "Alterando título da página". Se precisarmos alterar algo no commit de "Renomeando curso de Integração Contínua", que não é influenciado pelo título, basta utilizarmos git checkout master para retornarmos à branch correspondente.
+
+Feito isso, ao executarmos git log, não teremos acesso àqueles commits em titulo. Isso é bem interessante! Usaremos git checkout titulo para voltarmos, e passaremos a lidar com a Ana, que trabalhará com as listas de cursos. Criaremos, portanto, um branch com git branch lista, e depois faremos o checkout para a lista.
+
+Entretanto, existe um atalho que cria um branch e já passar para ele: git checkout -b lista, que usaremos. Com isso, a Ana está na branch lista, então poderemos abrir o projeto da Ana no VS Code e adicionar um curso em uma nova lista, como <li>Kubernetes</li>, junto aos demais. No Git Bash, digitaremos git status, verificaremos que há uma modificação, adicionaremos todas elas com git add ., e commitaremos com git commit -m "Adicionando curso de kubernetes".
+
+Assim, a Ana e o Vinicius estão trabalhando ao mesmo tempo em branches independentes de um mesmo projeto. Mas sabemos que em nosso repositório chamado local, por enquanto, temos apenas a branch master. Isso nos leva a assumir que esta branch é a nossa linha de desenvolvimento padrão, ou seja, nosso ramo principal, onde os códigos devem estar quando estiverem prontos, certo?
+
+Então, como será que fazemos para trazer os dados das branches titulo e lista para a master?
+
+https://git-school.github.io/visualizing-git
+
+@@02
+Para saber mais: Ramificações
+
+Branches ("ramos") são utilizados para desenvolver funcionalidades isoladas umas das outras. A branch master é a branch "padrão" quando você cria um repositório.
+É interessante separar o desenvolvimento de funcionalidades em branches diferentes, para que as mudanças no código, para um ramo, não influencie no funcionamento de outro.
+
+Nesta aula, entenderemos melhor como trabalhar com estes ramos, mas é muito importante que você entenda o propósito.
+
+Em outros treinamentos aqui na Alura, falaremos mais sobre estratégias para organizar suas branches, então não precisa se preocupar tanto com isso agora! ;-)
+
+@@03
+Unindo o trabalho
+
+Estamos entendendo como trabalhar com linhas de desenvolvimento diferentes, mas como é que conseguiremos trazer o trabalho que fizemos em uma delas para outra? Porque, recapitulando, eu, como Vinicius, tenho duas branches, titulo e master, e trabalhamos na primeira. Porém, no repositório que se encontra na pasta "servidor", só temos a branch master, então sabemos que esta linha é a principal, onde queremos depositar o código que funciona.
+Iremos trabalhar na titulo, mas em algum momento precisaremos trazê-la para a master. Na ferramenta Visualizing Git criaremos a branch titulo e passaremos a trabalhar nela, com git checkout -b titulo. Faremos um commit com git commit -m "Editando título", e outro, com git commit -m "Adicionando lista no título".
+
+Temos um problema: reparem que nosso curso de Docker na listagem de index.html está com este nome, mas deveria estar como "Docker: Criando containers sem dor de cabeça", e precisaremos corrigir isto. Isso, porém, não tem nada a ver com nossas alterações de títulos, que não está finalizada. Então precisaremos retornar à master e, a partir daí, corrigir o bug.
+
+Utilizaremos git checkout master, e depois git commit -m "Corrigindo bug". Agora, sim, poderemos voltar à branch titulo e finalizá-lo. Analisando com calma, porém, entendemos que esta branch já está finalizada. Então, de que forma trazemos este trabalho, os dados desta linha em específico, para a que contém head e master?
+
+Ou seja, queremos unificar estas duas linhas, portanto usaremos o comando git merge titulo, e isto fará com que o Git automaticamente crie um commit com o branch atual e todo o conteúdo de nossa branch titulo. Na prática, estando logados como Vinicius, o que acontece é que, ao surgimento de um bug, as alterações de titulo não podem influenciar nesta correção de bug.
+
+Sendo assim, retornaremos à master, branch que não contém as alterações referentes a titulo. Após a alteração no projeto, faremos a adição e o commit normalmente, no Git Bash, e por fim executaremos git merge titulo, como visto anteriormente. Quando dermos um "Enter", será criado um commit de merge, ou seja, de junção de duas branches. Poderemos editar a mensagem exibida, mas caso não queiramos, para salvarmos e confirmarmos a mensagem, pressionaremos ":x + Enter" no editor Vim.
+
+Feita a junção, passamos a ter, na branch master, os dados do título alterado. Porém, se executarmos git log, não teremos os dois commits separadamente, e sim um referente ao merge. O Git cria isto para nós. Então, como será que poderemos fazer com que, em vez do Git criar este commit, ele pegue os dois commits e os adicione em nossa branch master?
+
+Como faremos com que ele mova estas branches e atualize a master apenas com os dois commits, sem criar um de merge? Veremos isto a seguir!
+
+@@04
+Merge de branches
+
+Agora que entendemos como separar o desenvolvimento em linhas ("ramos") diferentes, é hora de trazer estas modificações para a master, que é a nossa branch "padrão".
+Supondo que ainda estamos na branch titulo, como podemos fazer o merge da branch titulo para a branch master?
+
+git merge titulo
+ 
+Alternativa correta
+git checkout titulo e git merge master
+ 
+Alternativa correta
+git checkout master e git merge titulo
+ 
+Alternativa correta! Desta forma colocaremos o HEAD na branch master, ou seja, faremos com que o nosso código esteja no estado que o deixamos com o último commit na master. Depois, uniremos o trabalho da branch titulo com a branch atual (master).
+
+@@05
+Atualizando a branch
+
+Anteriormente, vimos como unir o trabalho de duas branches desenvolvidas separadamente. No entanto, não queremos gerar um commit a mais, de merge, dependendo da estratégia utilizada para gerar os commits, isto pode acabar atrapalhando ou "poluindo" o log. Assim, o que queremos é atualizar a branch master com os commits da branch titulo, de modo a termos cada commit específico na linha de desenvolvimento master.
+Na ferramenta Visualizing Git executaremos clear para limparmos a tela, e repetiremos o processo com git checkout -b titulo para gerarmos dois commits (git commit duas vezes). Na branch master, corrigimos um bug, portanto geraremos outro commit. E então, da branch titulo, queremos trazer os demais commits para antes de master atualizando as duas branches.
+
+Para isto, estando na master, queremos basear esta branch em titulo, assim, executaremos git rebase titulo, e o Git pegará os commits na branch titulo, atualizando master, que possui todos os commits contidos em titulo, além do commit que havia nela mesma. Deste modo, geramos uma única linha, sem confusões.
+
+No Git Bash, executaremos git log novamente, e teremos a informação de commit de merge; de que forma conseguiremos visualizar isso de forma mais interessante? Se digitarmos git log --graph, serão exibidas linhas específicas representando o desenvolvimento, uma boa alternativa ao Visualizing Git.
+
+Vamos fazer uma alteração na branch titulo, com git checkout titulo, e no VS Code alteraremos a primeira letra de "Cursos" para que fique em maiúscula. Adicionaremos o arquivo e o commitaremos, e depois iremos à branch master para trazermos os commits de titulo para ela, por meio de git rebase titulo.
+
+Ao executarmos git log mais uma vez, teremos o commit "Corrigindo nome do curso de Docker" acima de "Cursos com letra maiúscula", porque ele foi adicionado logo antes. Isto é, o commit que fizemos na branch titulo foi adicionado logo antes do commit feito em master, exatamente como vimos no Visualizing Git.
+
+Ou seja, o rebase atualiza a branch, mantendo o trabalho dela como sendo o último, para que não se gere este tipo de confusão. Com isso, temos as correções realizadas tanto no título quanto na lista, e poderemos fazer o git push local master, logados como Vinicius. Tudo está atualizado! Podemos, então, nos logar como Ana, usar git checkout master e git pull local master para atualizar os dados também.
+
+Mas lembram que a Ana estava trabalhando em lista? Voltaremos para lá com git checkout lista para atualizarmos os dados, no caso, o título do curso de Docker. Commitaremos, faremos git log -p para garantir que a atualização foi feita, faremos um checkout para master. Teremos que houve uma alteração feita pelo Vinicius, e outra feita pela Ana, na mesma linha. O que será que acontecerá se tentarmos juntar o trabalho deles?
+
+@@06
+Mais sobre o rebase
+
+No último vídeo vimos o recurso rebase.
+À primeira vista ele parece não ter muita diferença com o merge, afinal de contas os dois métodos são usados para integrar mudanças de uma branch para outra. Afinal de contas, quando eu uso um ou outro e quais são realmente as diferenças?
+
+o merge integra o conteúdo da branch de trabalho (por exemplo titulo ou lista) com a branch master. Nesse caso apenas a branch master é alterada para adicionar as mudanças e o histórico da branch de trabalho permanece inalterado e um novo commit dessa junção é adicionado ao histórico.
+o rebase move a base da branch de trabalho para o final da branch master; ou seja, Nesse caso, o código também é integrado, porém porém ele faz isso transformando duas branches em uma só. Assim, a linha do tempo das alterações de código permanece sempre como uma linha contínua da branch master, apagando a branch de trabalho.
+O merge preserva o histórico "por extenso" e todos os commits feitos nas branches, e é possível consultar exatamente em que momento mudanças no código feitas através de branches de trabalho foram adicionadas à branch principal. Quando as branches são unidas usando rebase esse histórico não é preservado.
+
+Em projetos complexos, algumas pessoas podem achar essas ramificações um pouco confusas. Porém, por outro lado, uma única linha contínua faz com que não seja possível identificar exatamente os pontos de modificação no código.
+
+Traduzindo estes dois processos para um diagrama, teríamos o seguinte resultado:
+
+// usando merge
+
+* branch master
+॰ commit "master1"
+|
+|
+॰ commit "master2"
+|\
+| \
+|  \ branch lista
+|  ॰ commit "lista1"
+|  |
+|  |
+|  ॰ commit "lista2"
+|  |
+|  |
+|  ॰ commit "lista3"
+| / 
+॰ checkout master
+| merge lista
+|
+branch master contém alterações feitas em lista
+COPIAR CÓDIGO
+// usando rebase
+
+* branch master
+॰ commit "master1"
+|
+|
+॰ commit "master2"
+|
+|
+॰ checkout master
+| rebase lista
+|
+branch master contém alterações feitas em lista
+commits em master são preservados
+histórico da branch lista não é preservado
+COPIAR CÓDIGO
+Quando utilizar um ou outro?
+Como sempre dizemos em programação, depende. Em geral, partimos das seguintes situações:
+
+merge é mais indicado para trabalhos com branches compartilhadas, onde há várias pessoas envolvidas alterando diversas branches;
+rebase é mais indicado para projetos pessoais, times pequenos ou projetos mais simples.
+Em alguns casos específicos é possível usar o rebase mesmo em repositórios compartilhados, ou você pode preferir usar sempre merge mesmo trabalhando em um projeto pessoal privado. Ou seja, tudo depende do caso :) outros pontos a considerar:
+
+rebase pode ser útil para "limpar" linhas do tempo de repositórios que se tornaram muito poluídas pelo excesso de merging e branching;
+Se você quer preservar o histórico completo do projeto, independente da complexidade, use sempre merge;
+rebase pode facilitar a resolução de conflitos, porém pode também ser mais complicado voltar o código ao estágio anterior em caso de conflitos mais complexos.
+
+@@07
+Rebase vs Merge
+
+Já sabemos como trazer o trabalho de outra branch e unir com a branch atual. Conhecemos duas formas de fazer isso: merge e rebase.
+Neste cenário, qual a diferença entre os comandos rebase e merge?
+
+O rebase junta os trabalhos e gera um commit de junção. O merge aplica os commits de outra branch na branch atual.
+ 
+Alternativa correta
+O merge junta os trabalhos e gera um merge commit. O rebase aplica os commits de outra branch na branch atual.
+ 
+Alternativa correta! Com isso, evitamos os commits de merge. Há uma longa discussão sobre o que é "melhor": rebase ou merge. Estude, pesquise, e tire suas próprias conclusões. Aqui tem um artigo (de milhares outros) que cita o assunto: https://medium.com/datadriveninvestor/git-rebase-vs-merge-cc5199edd77c.
+Alternativa correta
+Ambos são sinônimos, ou seja, não há diferença
+
+https://medium.com/datadriveninvestor/git-rebase-vs-merge-cc5199edd77c
+
+@@08
+Resolvendo conflitos
+
+Vimos um caso interessante acontecer: o Vinicius corrigiu um bug, isto é alterou um determinado trecho de código, porém a mesma tarefa foi executada também pela Ana. O que será que irá acontecer se juntarmos estes trabalhos? Dentre merge e rebase optaremos pelo primeiro, embora o resultado deles seja o mesmo.
+Logados como Ana, utilizaremos git merge lista, e o Git nos informa que existe um conflito, e que houve falha no merge automático. É recomendado que corrijamos os conflitos primeiro, e depois commitemos o resultado. Ao voltarmos ao arquivo no VS Code, há indicações coloridas referenciando o conflito do Git, mas para o caso do uso de um editor de texto que não as tenha, focaremos somente no texto, ignorando as cores.
+
+Entre as linhas <<<<<<< HEAD (Current Change) e =======, estão os dados do commit atual, na master. E entre as linhas ======= e >>>>>>> lista (Incoming Change), são os dados que estamos tentando trazer da branch lista. Ou seja, é exibida exatamente a diferença entre ambos. E tudo que precisamos fazer para corrigir este conflito é remover as informações indesejadas, sem que haja duplicação.
+
+Editaremos e salvaremos o arquivo, retornaremos ao Git Bash e executaremos git status, e teremos a informação de que houve uma modificação em dois lugares, na branch atual e aquela que estamos tentando unificar. Feita a correção, simplesmente utilizaremos git add index.html, e então git commit para que o commit de merge seja realizado. Desta vez, se executarmos git log --graph, teremos a indicação do merge de lista. Em seguida, poderemos usar git push local master.
+
+Vamos imaginar que o Vinicius corrija o título do curso de Vagrant para "Vagrant: Gerenciando máquinas virtuais", e nos logar como Vinicius, solicitar status, adicionar e commitar a alteração. Enviaremos as informações, e o que acontece é que enquanto o Vinicius estava trabalhando, a Ana enviou outra informação, o commit de merge.
+
+É necessário, então, antes de enviarmos quaisquer dados e alterações, garantir que estamos trabalhando com a versão mais recente do código. Isso significa que, antes do envio, precisaremos trazer este código de volta (git pull local master). Agora, sim, será feito o merge da master que está no "servidor" com esta.
+
+Assim, poderemos confirmar que tudo está como gostaríamos no VS Code, e depois enviar a alteração, com git push local master. Sempre que formos iniciar um desenvolvimento novo, sabemos que precisaremos verificar se há alguma alteração lá antes de enviarmos os dados. Antes da Ana continuar e fazer alguma alteração nova, ela sabe que é necessário verificar se não há nenhuma alteração ali, com git pull local master.
+
+As informações são trazidas conforme esperado pelo Git Bash. Deste modo evitamos maiores conflitos, mas se acontecer, já vimos que conseguimos resolvê-los tranquilamente. Entendemos como trabalhar com repositórios remotos, em equipe, com branches independentes, e como uni-las, seja por meio do merge ou do rebase.
+
+Existem estratégias bem específicas de quando e como criar uma branch, e podem surgir dúvidas quanto à criação de uma branch para cada funcionalidade ou feature nova. Sem entrar em detalhes — por não ser o foco deste curso — sabemos que branches são linhas de desenvolvimento, e aprendemos a lidar com elas.
+
+Considerando estes aprendizados, como será que poderemos navegar no histórico do nosso projeto? E desfazer uma alteração?
+
+@@09
+Para saber mais: Editor Vim
+
+No último vídeo, quando foi utilizado o comando git merge, foi aberta a tela do Editor Vim, que é um programa de edição de texto que funciona via terminal.
+Caso você não tenha familiaridade com essa ferramenta e queira se aprofundar mais, recomendo que leia o artigo abaixo, o qual irá explicar alguns comandos básicos para usar o Vim.
+
+Comandos básicos ao utilizar o Vim (Editor de textos)
+
+https://www.alura.com.br/artigos/comandos-basicos-ao-utilizar-o-vim?_gl=1*1uynlag*_ga*MTAwODgzMTc4OS4xNjg5NjY0Njk1*_ga_59FP0KYKSM*MTY4OTY5MjA3MC44LjEuMTY4OTY5NTMyMC4wLjAuMA..*_fplc*M0s4RTZlanlFUU9jenRzZ0dKTnlVT3pOdWVLQkNZWHEzMDFRaFZUQ25KYmphJTJGNDNZcGNsTDBXWnZHdHNDcWJVMmxyOWN2SU1zN1BJMVJaQnZMNG0yQ0RNUW1WWUJWNmJBdjNvTTBpRGltS0IlMkJocDUydzFRWE5VSENXUklYdyUzRCUzRA..
+
+@@10
+Para saber mais: Conflitos com rebase
+
+Vimos como é simples resolver conflitos identificados pelo Git ao tentar realizar o merge.
+Agora, gere um conflito e, ao invés de utilizar o merge, utilize o rebase para atualizar o master:
+
+Vá para a branch titulo
+Commite algo
+Vá para a branch master, commite uma alteração na mesma linha
+Execute git rebase titulo
+Veja a saída do Git e utilize as informações que ela te der para, após corrigir o conflito, continuar o rebase.
+
+Boa sorte! ;-)
+
+@@11
+Consolidando o seu conhecimento
+
+Chegou a hora de você pôr em prática o que foi visto na aula. Para isso, execute os passos listados abaixo.
+1) Execute o comando git branch e veja que apenas a branch master existe no seu repositório;
+
+2) Execute o comando git branch titulo e logo após execute o comando git branch. Veja que uma nova branch foi criada;
+
+3) Agora, para começar a trabalhar nesta branch, digite git checkout titulo;
+
+4) Execute novamente git branch e confira que agora você está na branch chamado titulo;
+
+5) Altere o título da página index.html para "Cursos de DevOps da Alura";
+
+6) Adicione as alterações com git add index.html;
+
+7) Faça o commit, com git commit -m "Alterando título da página";
+
+8) Execute o comando git log e confira o novo commit;
+
+9) Altere o título da página para "Lista de cursos de DevOps da Alura";
+
+10) Repita os passos 6 e 7, para adicionar um novo commit, alterando a mensagem;
+
+11) Repita o passo 8 para conferir o novo commit;
+
+12) Execute o comando git checkout master para voltar à linha de desenvolvimento master;
+
+13) Execute git log para conferir que os últimos dois commits não estão lá. Confira se o conteúdo do seu arquivo também voltou ao seu estado original;
+
+14) Na pasta criada para representar o trabalho de outra pessoa na aula anterior:
+
+Execute git checkout -b lista para criar uma nova branch, chamada lista e passar a trabalhar nela;
+Adicione o curso de "Kubernetes" na lista;
+Repita os passos 6 e 7 para adicionar um novo commit, alterando a mensagem;
+Execute o comando git checkout master para voltar à linha de desenvolvimento master;
+15) Volte para a pasta que representa o seu próprio trabalho;
+
+16) Altere o nome do curso de Docker para "Docker: Criando containers sem dor de cabeça";
+
+17) Repita os passos 6 e 7 para adicionar um novo commit, alterando a mensagem;
+
+18) Execute o comando git merge titulo para trazer o trabalho feito na branch titulo para a branch master;
+
+19) Execute o comando git log --graph para ver as linhas de desenvolvimento (branches);
+
+20) Execute git checkout titulo para trabalhar na branch chamada titulo;
+
+21) Altere o título para ter a palavra "Cursos" com letra maiúscula;
+
+22) Repita os passos 6 e 7 para adicionar um novo commit, alterando a mensagem;
+
+23) Execute o comando git checkout master para voltar à linha de desenvolvimento master;
+
+24) Execute o comando git rebase titulo;
+
+25) Execute o comando git log e confira que o commit foi adicionado antes do commit realizado diretamente na branch master;
+
+26) Execute o comando git push local master para enviar suas alterações para o repositório remoto que criamos na última aula;
+
+27) Na pasta criada para representar o trabalho de outra pessoa na aula anterior:
+
+Execute o comando git pull local master para baixar as alterações que você já realizou;
+Execute o comando git checkout lista para continuar trabalhando na lista de cursos;
+Altere o nome do curso de Docker para "Curso de Docker: Criando containers sem dor de cabeça";
+Repita os passos 6 e 7 para adicionar um novo commit, alterando a mensagem;
+Execute o comando git checkout master para voltar à linha de desenvolvimento master;
+Tente juntar seu trabalho com git merge lista;
+Veja que há conflitos. Corrija-os, deixando apenas a linha com o nome correto do curso;
+Execute o comando git add index.html para informar que os conflitos neste arquivo foram corrigidos;
+Execute o comando git commit para que o Git finalize o merge;
+Execute o comando git push local master para enviar as suas alterações;
+28) Volte para a pasta que representa o seu próprio trabalho;
+
+29) Altere o nome do curso de Vagrant para "Vagrant: Gerenciando máquinas virtuais";
+
+30) Repita os passos 6 e 7 para adicionar um novo commit, alterando a mensagem;
+
+31) Tente executar o comando git push local master. Veja a falha;
+
+32) Execute o comando git pull local master para trazer as alterações da outra pessoa;
+
+33) Agora sim, execute o comando git push local master para enviar as alterações.
+
+Opinião do instrutor
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@12
+O que aprendemos?
+
+Nesta aula, aprendemos:
+Que uma branch (ou ramo) é uma linha de commits separada, e que pode ser utilizada para desenvolver funcionalidades independentes;
+Que com branches separados, podemos evitar que o código de uma funcionalidade interfira em outra;
+Como trazer o trabalho realizado em uma branch para outra branch, como por exemplo, o master, através do comando git merge;
+Que o git merge gera um novo commit, informando que houve uma mescla entre duas branches;
+Como trazer os commits de uma branch para outra, com o git rebase
+Que o git rebase não gera um commit de merge, simplificando o nosso log;
+Como os conflitos são apresentados pelo Git;
+Como resolver os conflitos e manter apenas as alterações desejadas com o Git.
