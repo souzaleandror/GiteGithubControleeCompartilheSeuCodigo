@@ -989,7 +989,9 @@ Que o git rebase não gera um commit de merge, simplificando o nosso log;
 Como os conflitos são apresentados pelo Git;
 Como resolver os conflitos e manter apenas as alterações desejadas com o Git.
 
-@03-Manipulando as versões
+#### 19/07/2023
+
+@05-Manipulando as versões
 
 @@01
 Ctrl + Z no Git
@@ -1180,3 +1182,163 @@ Que o comando git stash pop aplica e remove a última alteração que foi adicio
 Que o git checkout serve para deixar a cópia do código da nossa aplicação no estado que desejarmos:
 git checkout <branch> deixa o código no estado de uma branch com o nome <branch>;
 git checkout <hash> deixa o código no estado do commit com o hash <hash>.
+
+@06-Gerando entregas
+
+@@01
+Vendo as alterações
+
+Temos um projeto finalizado, com todas as alterações necessárias no conteúdo entre tags <titulo>, todos os nomes da listagem de cursos estão corretos, já vimos como trabalhar em equipe, com repositórios remotos, branches independentes, corrigindo conflitos, alocando dados, atualizando branches, enfim, vimos bastante conteúdo.
+Entretanto, no momento de finalizarmos, queremos verificar o que houve em cada commit, para garantir que nenhum bug foi adicionado no projeto, e entender o que de fato cada commit gerou no código. Como conferiremos as diferenças entre commits?
+
+Logados como Vinicius, já entendemos que, se utilizarmos git log -p, conseguiremos ver o que foi alterado em código commit a commit. Existe um comando do Git, bem interessante e poderoso, que é o git diff, capaz de exibir estas diferenças. Ao tentarmos executá-lo, porém, nada é exibido.
+
+Isso porque por enquanto não há nada alterado no nosso código, que não tenha sido salvo. Então, para entendermos as diferenças entre dois commits, precisaremos informar quais são, no caso, ea539b3 até (..) 6ca12ac. Por meio deste comando, visualizamos todas as alterações feitas, marcadas em cores diferentes.
+
+Além disso, caso estejamos modificando algo, como acresentando um novo curso na listagem, no código, e queiramos verificar o que foi alterado, poderemos simplesmente usar o git diff, que nos mostra o que foi alterado e que ainda não foi adicionado para commit. Mas a partir do momento em que adicionamos o arquivo, este comando não nos mostra mais o que existe de diferente.
+
+Traremos o arquivo de volta após git status com git reset HEAD index.html, e com git status conferiremos que ele está pronto para ser adicionado ao commit. Vamos desfazer as alterações com git checkout -- index.html. Desta forma, conseguimos começar a analisar com maior controle todas as alterações que foram adicionadas durante o desenvolvimento de um projeto.
+
+Após termos visto as alterações e garantido que realmente não há bugs, de que forma poderemos gerar uma versão, por exemplo, 0.1? Como será possível definirmos isto com o Git? Vamos conversar sobre isso adiante.
+
+@@02
+Exibição das mudanças com o diff
+
+Com o comando git diff, nós vimos que é possível visualizarmos as mudanças realizadas em determinado código. Podemos ver as diferenças entre commits, branches, etc.
+Como o git diff exibe as mudanças no código?
+
++ linha adicionada
+- linha removida
+- linha modificada (versão antiga)
++ linha modificada (nova versão)
+ 
+Alternativa correta! O sinal de subtração (-) antes da linha indica que ela não está mais presente no arquivo. Já o sinal de adição (+) mostra que é uma linha nova. Alterações são representadas por uma remoção e uma adição de linha.
+Alternativa correta
++ linha adicionada
+# linha removida
+# linha modificada (versão antiga)
++ linha modificada (nova versão)
+ 
+Alternativa correta
+# linha adicionada
+- linha removida
+- linha modificada (versão antiga)
+# linha modificada (nova versão)
+
+@@03
+Tags e releases
+
+Tendo finalizado o projeto de fato, queremos gerar uma versão, indicando ao Git que a partir do penúltimo commit — que acessaremos com git log -n 2 — seja cravada uma marcação, um checkpoint indicando que trata-se da versão 0.1, por exemplo. Em vários outros sistemas de controle de conteúdo, existe o conceito de tag, como quando você cria blogs e possui tags para marcar postagens que pertencem a categorias específicas.
+No Git, é possível utilizar um conceito bastante similar, também denominado tag, capaz de marcar um ponto na aplicação que não pode ser modificado, fixo. Assim, após ser lançada, a versão 0.1 nunca deixará de ser a versão 0.1, e quaisquer alterações que forem feitas nela, serão incluídas na versão posterior.
+
+Isso não quer dizer que faremos um código que não será mais editável, apenas que criaremos um marco para onde poderemos ir, e que terá um código correspondente àquele estado. E para criarmos uma tag, informaremos isto ao Git, com git tag -a, seguido do nome que damos a ela, v0.1.0, que poderia ser qualquer outro. Além disto, poderemos incluir uma mensagem. O comando completo ficaria, então: git tag -a v0.1.0 -m "Lançando a primeira versão (BETA) da aplicação de cursos".
+
+Ao darmos "Enter", geramos uma tag, um marco na nossa aplicação. E se executarmos git tag, são exibidos todos estes marcos disponíveis, que no caso por enquanto se resume a apenas um. Já sabemos que é possível fazer push de master, ou de qualquer outra branch, como com git push local master e depois git push local v0.1.0 para enviarmos a tag ao servidor.
+
+Para nos lembrarmos de um detalhe, vamos executar git remote -v. Estamos utilizando o GitHub, e temos um repositório local denominado origin, que faz menção a ele. Então, atualizaremos nosso código no GitHub com git push origin master. Também enviaremos a tag, com git push origin v0.1.0. Mas como será que visualizamos tags por meio do GitHub?
+
+Atualizaremos a página do navegador, que nos informa que temos 17 commits, 1 branch (já que não enviamos as demais para lá), e 1 release, que é a versão pronta para ser lançada ou baixada por qualquer pessoa que queira utilizar em seu sistema. Poderemos ver a nossa mensagem, em qual commit a tag foi gerada, e baixar clicando no ícone com "zip".
+
+A release poderá inclusive ser compartilhada com outras pessoas, por meio da URL correspondente, possibilitando o acompanhamento das releases do projeto. Esta é uma feature bem interessante do GitHub!
+
+@@04
+Para saber mais: Criando releases no GitHub
+
+Nessa aula você aprendeu sobre os recursos de Tag e Release e, embora sejam dois conceitos que estão relacionados entre si, eles não são iguais.
+Tag
+Uma Tag no Git é uma referência estática a um ponto específico na história do seu repositório. Ela é usada para marcar commits importantes, como versões estáveis, marcos de desenvolvimento ou releases principais. Basicamente, uma Tag é uma forma de nomear um commit específico para que você possa referenciá-lo facilmente posteriormente.
+
+As Tags são úteis para marcar pontos significativos na linha do tempo do seu projeto, permitindo que você recupere facilmente versões específicas do código no futuro. Elas são usadas principalmente para identificar versões estáveis do software, como v1.0, v2.0, etc. As Tags também podem ser anotadas, ou seja, você pode adicionar uma mensagem descritiva para fornecer mais informações sobre aquela versão específica.
+
+No vídeo anterior foi demonstrado como listar e criar tags no Git, via comando git tag, e também como enviar uma tag para o repositório remoto no GitHub.
+
+Release
+Uma Release no GitHub é uma versão específica do seu projeto que é disponibilizada para download ou deploy. É uma forma de empacotar um conjunto de arquivos do seu repositório em um formato que possa ser facilmente distribuído. Uma Release geralmente contém arquivos compilados, binários, documentação ou qualquer outra coisa necessária para distribuir seu software.
+
+Ao criar uma Release no GitHub, você pode escolher quais commits, Tags ou branches deseja incluir no pacote. Isso permite que você selecione exatamente quais alterações ou versões do seu código fazem parte daquela Release específica. Cada Release geralmente possui um número de versão associado, como v1.0.0, v2.1.3, etc.
+
+Criando Releases no GitHub
+Ao enviar uma tag para o GitHub, via comando git push, uma release não é criada automaticamente. Caso você queira criar uma release baseada em uma tag, deve fazer isso manualmente. A seguir um passo a passo de como realizar esse procedimento:
+
+Acesse a página do seu repositório no GitHub e clique no link Tags: Tela do repositório destacando o link para acessar a página de listagem de tags e releases
+Na página de listagem de tags, clique no botão Releases: Tela de listagem de releases vazia e exibindo o botão para criar nova release
+Repare que o GitHub indica que não existem releases no repositório e exibe um botão para criar uma nova release. Clique nesse botão para abrir a página de criação de release, na qual você deve escolher a tag associada à nova release sendo criada, além de também poder preencher um título e uma descrição: Tela de cadastro de release no GitHub
+Pronto! Após isso a nova release será exibida na tela de releases:
+
+Tela exibindo a lista de releases do repositório no GitHub
+
+@@05
+Tags no GitHub
+
+Vimos no último vídeo como gerar versões, ou marcos interessantes em nosso sistema de controle de versões.
+Que resultado o envio de uma tag para o GitHub possibilita?
+
+Nada diferente do que já vemos no terminal
+ 
+Alternativa correta
+Gera um pedido de melhoria
+ 
+Alternativa correta
+Gera uma Release, ou seja, conseguimos baixar um arquivo compactado com o nosso código neste ponto
+ 
+Alternativa correta! O GitHub nos dá a possibilidade de baixar um arquivo compactado contendo o código no estado em que a tag foi gerada.
+
+@@06
+Consolidando o seu conhecimento
+PRÓXIMA ATIVIDADE
+
+Chegou a hora de você pôr em prática o que foi visto na aula. Para isso, execute os passos listados abaixo.
+1) Execute o comando git log -p para ver, junto a cada commit, as alterações nele realizadas;
+
+2) Execute agora o comando git log --oneline;
+
+3) Execute o comando git diff {hash do commit de merge com lista}..{hash do último commit realizado};
+
+4) Execute alguma (pequena) alteração no index.html;
+
+5) Execute o comando git diff e veja esta alteração;
+
+6) Desfaça esta última alteração;
+
+7) Execute o comando git tag -a v0.1.0 para criar uma tag no seu código;
+
+8) Execute o comando git push origin v0.1.0 para enviar esta tag para o GitHub;
+
+9) Abra a página do repositório do GitHub que você criou e confira a aba de Releases.
+
+Opinião do instrutor
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@07
+O que aprendemos?
+PRÓXIMA ATIVIDADE
+
+Nesta aula, aprendemos:
+Que é possível visualizar quais alterações foram realizadas em cada arquivo, com o comando git diff;
+Que, digitando apenas git diff, vemos as alterações em nossos arquivos que não foram adicionadas para commit (com git add);
+Que é possível comparar as alterações entre duas branches com git diff <branch1>..<branch2>
+Que é possível comparar as alterações feitas entre um commit e outro, através do comando git diff <commit1>..<commit2>;
+Que o Git nos possibilita salvar marcos da nossa aplicação, como por exemplo, lançamento de versões, através do git tag;
+Que o comando git tag -a é utilizado para gerar uma nova tag;
+As Releases do GitHub, que são geradas para cada tag do Git criada em nosso repositório.
+
+@@08
+Conclusão
+
+Atenção! Atualmente não utilizamos mais o termo master como repositorio principal, e sim main, sendo esse é o novo padrão do GitHub desde o fim de 2020. Essa nomenclatura é mais inclusiva e facilita o entendimento entre pessoas desenvolvedoras.
+Boas vindas ao final do curso de Git e GitHub, uma introdução a tudo que a ferramenta de controle de versões pode nos oferecer, ainda há muito o que aprender.
+
+Para darmos uma recapitulada, primeiro entendemos o conceito de repositório, o qual inicializamos na pasta do nosso projeto utilizando git init. Depois, vimos que com git status conseguimos verificar as alterações já foram realizadas em nosso código, se existe algum arquivo para ser adicionado, ou commitado, algum arquivo que ainda não é trackeado ou monitorado, e assim por diante.
+
+Caso haja alguma modificação a ser adicionada, o fazemos com git add. Então, vimos que precisamos gerar commits, que funcionam como sendo um ponto de alteração a ser salva. Conversamos um pouco sobre quando commitar, no entanto, o ponto principal é nunca commitar um código que não funciona.
+
+Aprendemos a verificar nosso histórico de alterações e navegar por elas com git log --oneline, geramos tags, uma release que, ao fim, após termos entendido um pouco melhor e trabalhado com GitHub, gera um entregável, uma versão pronta para ser baixada. Vimos também como criar um repositório ao nos cadastrarmos no GitHub, e depois disso, como enviar os dados do nosso projeto local para ele.
+
+Percebemos que com estes repositórios remotos, conseguimos trabalhar em conjunto com outras pessoas da nossa equipe. Além disto, vimos como criar um repositório remoto em nosso próprio computador, e com isto atualmente temos dois deles, identificados a partir do comando git remote -v, um denominado local, e outro, de origin.
+
+Aprendemos que não é difícil trabalharmos com mais de um usuário em um mesmo projeto, resolvemos conflitos, trabalhamos com branches, e ainda há muito mais conceito por trás deles, com os quais não trabalhamos no decorrer deste curso, mas o mais importante neste primeiro momento é entender que branches são linhas de desenvolvimento distintas, e mais para a frente poderemos, em cursos futuros, trabalhar as estratégias de quais branches criar, como gerenciá-las, e por aí vai.
+
+Vimos como navegar pelo histórico do nosso código, pelos commits, desfazendo alterações, salvando-as de forma temporária para depois as recuperarmos, com git stash, enfim, isso tudo em um único arquivo, o index.html, ou seja, nem focamos ou entramos em detalhes em relação ao código, justamente para focarmos em todo o poder que o Git tem a oferecer.
+
+Mais uma vez, isso não é tudo, outros cursos virão para nos aprofundarmos um pouco mais, lembrando que este conteúdo é o suficiente para nosso dia a dia. Espero que tenham tirado bastante proveito, caso tenha ficado alguma dúvida, não deixe de abrir um tópico no fórum. Espero te ver em cursos futuros aqui na Alura! Forte abraço e bons estudos!
