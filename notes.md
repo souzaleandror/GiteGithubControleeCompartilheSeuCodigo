@@ -988,3 +988,195 @@ Como trazer os commits de uma branch para outra, com o git rebase
 Que o git rebase não gera um commit de merge, simplificando o nosso log;
 Como os conflitos são apresentados pelo Git;
 Como resolver os conflitos e manter apenas as alterações desejadas com o Git.
+
+@03-Manipulando as versões
+
+@@01
+Ctrl + Z no Git
+
+Conseguimos nos conectar com repositórios remotos, adicionar mais de um deles, conseguimos compartilhar o código com colegas de equipe, organizar nosso versionamento em branches, linhas de desenvolvimento distintos, e antes de continuarmos com este aprendizado — no repositório da Ana não fizemos aquela configuração para definir que o nome de quem faz o commit é o dela, para mantermos o histórico correto.
+Vamos criar a configuração com git config --local user.name "Ana", a partir do qual todos os commits que forem feitos neste repositório irão pertencer a ela. Continuando, é muito comum começarmos a desenvolver e fazer testes e termos que desfazer estas alterações. De que forma será que conseguimos desfazê-las com o Git? Será que ele possui alguma espécie de atalho "Ctrl + Z"?
+
+No VS Code, passaremos a trabalhar com o projeto do Vinicius. Na lista de cursos, trocaremos "Ansible" por "Ansible: Infraestrutura como código". Salvaremos o arquivo index.html, visualizaremos a página e acharemos que não ficou tão interessante. Reparem que não fizemos o commit, a adição, nem nada disso, apenas editamos o código.
+
+Por se tratar de um único arquivo, a alteração em uma linha poderia ser desfeita com "Ctrl + Z", mas imaginemos um projeto grande, em que fazemos várias alterações, e só então entendemos que não está como queremos. Teríamos que ir desfazendo-as arquivo por arquivo, ou que só percebemos que não gostamos da alteração após ter passado um dia inteiro, impossibilitando o uso do atalho?
+
+No Git Bash, logados como Vinicius, usaremos git status, o que nos traz algumas informações. É identificado que houve modificações no arquivo, que ainda não foram commitadas. Para isso, precisaríamos chamar o git add, no entanto, é indicado que, se quiséssemos descartar as alterações, poderemos chamar git checkout -- seguido do que queremos desfazer.
+
+O git checkout, portanto, serve para navegarmos em estados do repositório, seja por meio de branches ou desfazendo modificações no arquivo. Sendo assim, neste caso é possível executarmos git checkout -- index.html. Se executarmos git status novamente, não teremos nada a ser commitado, e se abrirmos o arquivo no VS Code, verificaremos que o teste foi realmente desfeito.
+
+Porém, e se depois da alteração no título do curso no VS Code fossemos diretamente ao Git Bash e usássemos git add index.html, mas antes do commit, testássemos e víssemos que não ficou como gostaríamos? Queremos desfazer uma alteração que já foi marcada para ser commitada, então usaremos git status para verificar se o próprio Git nos traz alguma ajuda.
+
+É exibido que há mudanças a serem commitadas, e que poderemos utilizar git reset HEAD seguido do nome do arquivo a ser desmarcado como algo que precisa passar pelo commit. Vamos fazer isso! Para este reset, é preciso enviar um estado, e como ele voltará para o HEAD, para o local de trabalho, isto é, o estado em que ainda estaremos trabalhando.
+
+Feito isto, com git status confirmaremos que as alterações continuam ali, porém não estão mais marcadas para serem commitadas. Sendo assim, basta utilizarmos git checkout -- index.html, o que fará com que não tenhamos mais nada a ser commitado, uma vez que a alteração foi desfeita com sucesso.
+
+Agora, imaginemos o pior dos casos: após fazermos a alteração no título do curso, a adição e o commit do arquivo, acabamos verificando que introduzimos um bug, e que este código não podia ter sido commitado. Como será que desfazemos um commit já realizado? Usando git log, teremos o hash do commit, certo?
+
+Iremos copiá-lo, colar na linha de comando, juntamente com git revert. Isso fará com que o commit informado seja desfeito, criando outro. Ao ser rodado, portanto, ele irá gerar um commit cuja mensagem pode ser alterada, usaremos ":x" para salvarmos e sairmos da tela. Ao fazermos git log mais uma vez, teremos dois commits, um com a alteração do nome do curso, e outro com a reversão deste.
+
+No VS Code, teremos a versão inicial, conforme gostaríamos. Desta forma, conseguimos desfazer nossos trabalhos e eventuais descuidos, e permite testes.
+
+Prosseguindo, imaginemos um código que ainda não está pronto para ser commitado por estar em um estágio não funcional, mas que não queremos desfazê-lo. Há uma nova demanda, uma tarefa a ser feita; será que conseguimos salvar o arquivo temporariamente, com o Git? Veremos isto a seguir!
+
+@@02
+Desfazendo o trabalho
+
+No último vídeo, nós aprendemos a desfazer alterações das quais não vamos precisar mais.
+Quais os comandos, respectivamente, desfazem alterações antes de adicioná-las (1); depois de adicioná-las, mas antes de commitá-las (2); e após realizar o commit (3)?
+
+1 - git revert
+2 - git reset
+3 - git checkout
+ 
+Alternativa correta
+1 - git rm
+2 - git reset
+3 - git bisect
+ 
+Alternativa correta
+1 - git checkout
+2 - git reset
+3 - git revert
+ 
+Alternativa correta! Com o git checkout nós desfazemos uma alteração que ainda não foi adicionada ao index ou stage, ou seja, antes do git add. Depois de adicionar com git add, para desfazer uma alteração, precisamos tirá-la deste estado, com git reset. Agora, se já realizamos o commit, o comando git revert pode nos salvar.
+
+@@03
+Guardando para depois
+
+E se quisermos guardar uma parte de uma alteração para depois, como faremos? Alguma modificação no código, para voltarmos a trabalhar nela depois, sem que precisemos commitá-la ou desfazê-la?
+Alteraremos novamente o título do curso de Ansible para "Ansible: Infraestrutura como código", no entanto, ainda precisaremos confirmar se este é o nome exato do curso, com mais calma, depois, pois fomos interrompidos por uma nova tarefa mais urgente. No Git, existe um conceito denominado Stash, e por meio de git stash conseguimos salvar todas as alterações, no caso, somente o arquivo index.html, para um local temporário, sem necessidade de um commit ou de se gerar um commit para isto.
+
+Se, após git stash executarmos git stash list, teremos uma lista de tudo que estiver salvo nestas condições. Vamos, então, alterar o nome do curso de Kubernetes, para "Kubernetes: Introdução a orquestração de containers". Executaremos, então, git status, seguido de git add index.html, git commit -m "Alterando o nome do curso de Kubernetes".
+
+Feito isto, queremos voltar a trabalhar com as alterações no curso de Ansible. No VS Code, teremos que as alterações em relação ao título do Kubernetes já foram realizados, porém os de Ansible, não. Queremos trazer os dados armazenados pelo git stash ao diretório de trabalho. Há duas opções: executarmos git stash list, e em seguida passarmos o número da stash em git stash apply 0, aplicaremos estas modificações, porém elas continuarão na stash. Para a remoção, poderemos usar git stash drop.
+
+No caso de querermos fazer ambas as ações ao mesmo tempo, ou seja, pegar a última alteração adicionada à stash, e já removê-la de lá, utilizaremos git stash pop que, ao ser executado, realiza o merge com as modificações que já temos e aplica aquelas que já estavam salvas lá. Desta vez, ao consultarmos o VS Code, teremos o código atualizado adequadamente, com o trecho alterado e salvo temporariamente sem necessidade de commit.
+
+Vamos alterar mais uma vez o título do curso de Ansible, para "Ansible: Sua infraestrutura como código", e no Git Bash faremos a adição e commit. Feito isso, realizaremos o envio, pois é sempre importante manter o nosso repositório remoto atualizado. Executaremos o comando git log --oneline, e perceberemos que temos vários commits, dentre os quais um de merge, Merge branch 'lista'.
+
+Veremos a seguir como fazemos com que o nosso código volte para o estado em que estava no momento em que aplicamos este commit!
+
+@@04
+Salvando temporariamente
+
+Vimos como podemos utilizar git stash para armazenar temporariamente algumas de nossas alterações.
+Em que momento o stash parece útil?
+
+Selecione uma alternativa
+
+Quando finalizamos uma tarefa e queremos salvar estas alterações
+ 
+Alternativa correta
+Quando queremos ver como o nosso código era antes
+ 
+Alternativa correta
+Quando precisamos parar o desenvolvimento de algo no meio para trabalhar em outra coisa
+ 
+Alternativa correta! Quando precisamos pausar o desenvolvimento de alguma funcionalidade, ou correção, antes de finalizar, talvez não seja interessante realizar um commit, pois o nosso código pode não estar funcionando ainda. Nesse caso é interessante salvar o trabalho para podermos voltar a ele depois.
+
+@@05
+Viajando no tempo
+
+Queremos observar o projeto como um todo no momento em que aplicamos um determinado merge, ou então um pouco antes, em outro commit. Executamos o git revert anteriormente com aquele commit e o hash, mas poderemos executar as manipulações em um commit com os seus primeiros caracteres. O comando git log --oneline, por exemplo, nos traz os hashs com apenas os sete primeiros caracteres, o suficiente para identificá-los de forma única.
+No caso, queremos navegar ao commit de hash ea539b3. Já conversamos que o comando git checkout muda o estado da aplicação, seja desfazendo alterações, navegando entre branches ou commits. Assim, é possível utilizarmos git checkout ea539b3, e com isso a mensagem que se exibe indica que estamos em um estado de cabeça (HEAD) desanexado (detached) do controle de versões.
+
+Isto é, não estamos mais em nenhum branch, e sim em um commit específico. Não estamos em uma linha bem definida de commit, uma linha de trabalho bem definida do Git. Então, poderemos fazer algumas modificações experimentais, mas também descartar qualquer elemento deste branch sem fazer mais nada. Isto quer dizer que se voltarmos à master, tudo que commitarmos aqui será ignorado.
+
+Se quisermos manter os commits feitos a partir deste ponto, será necessário criar uma nova branch. Reabriremos a ferramenta Visualizing Git para executarmos três git commit seguidos. Para verificarmos como estava o projeto durante o segundo commit, usaremos git checkout 54727de. Isto fará com que HEAD se locomova até ali, no lado direito da tela, e o estado do código esteja sendo exibido no segundo commit.
+
+Se realizarmos qualquer alteração, incluindo outro git commit, o HEAD se locomoverá para um lugar sem nome, uma branch inexistente. E se fizermos git checkout master nunca mais conseguiremos acessar o commit em que estávamos anteriormente, que fica desanexado das linhas de desenvolvimento.
+
+Repetiremos o comando git checkout 54727de e, se quisermos fazer alterações que sejam salvas a partir daqui, será necessário criar uma branch antes, a ser modificado a partir deste commit. Usaremos git checkout -b novo-branch, de forma a não estarmos mais desassociados da linha de desenvolvimento, o que se confirma se realizarmos um novo commit.
+
+Poderemos fazer o git checkout master, mas se em algum momento quisermos voltar a trabalhar em novo-branch, basta usarmos o git checkout. Assim, conseguimos navegar entre os estados da nossa aplicação, de fato, "viajar no tempo" no projeto. Temos bastante conhecimento e poderemos fazer praticamente tudo o que é necessário para um trabalho do dia a dia, com o sistema de gerenciamento de versões.
+
+Mas como informamos que temos uma versão pronta do sistema, um "entregável"? Será que o Git nos ajuda a gerar este tipo de projeto pronto para ser lançado?
+
+@@06
+Checkout
+
+Já utilizamos em mais de uma ocasião o comando git checkout.
+Resumidamente, para que serve o comando git checkout?
+
+Para deixar o nosso código em determinado estado
+ 
+Alternativa correta! A descrição do comando git checkout --help, em uma tradução livre é: "Atualizar os arquivos na working tree para ficarem na versão especificada. [...]". Basicamente, podemos deixar o nosso código no estado do último commit de uma branch, de um commit específico, ou mesmo tags (que veremos adiante).
+Alternativa correta
+Para ver o nosso código antigo
+ 
+Alternativa errada! O comando git checkout é mais poderoso do que isso.
+Alternativa correta
+Para sincronizar dados com o repositório remoto
+
+@@07
+Consolidando o seu conhecimento
+
+Chegou a hora de você pôr em prática o que foi visto na aula. Para isso, execute os passos listados abaixo.
+1) Na pasta que representa o seu projeto, faça uma alteração qualquer no arquivo index.html;
+
+2) Execute o git status e veja que há uma alteração para adicionar;
+
+3) Execute o comando git checkout -- index.html. Confira se sua alteração foi desfeita;
+
+4) Novamente, faça alguma alteração no arquivo index.html;
+
+5) Execute o comando git add index.html;
+
+6) Execute o comando git reset HEAD index.html para trazer o arquivo index.html de volta para a HEAD do projeto (remover do stage, que é o que será enviado para o commit);
+
+7) Repita o passo 3;
+
+8) Faça mais uma vez alguma alteração no código;
+
+9) Execute o comando git add index.html e o comando git commit -m "Alterando o código" para realizar um commit;
+
+10) Execute o comando git log e copie o hash deste commit recém criado;
+
+11) Rode o comando git revert {hash}, substituindo {hash} pelo hash que você copiou anteriormente;
+
+12) Confira que suas alterações foram desfeitas;
+
+13) Mude o nome do curso de Ansible para "Ansible: Infraestrutura como código";
+
+14) Execute o comando git stash para salvar estas alterações na stash;
+
+15) Altere o nome do curso de Kubernetes para "Kubernetes: Introdução a orquestração de containers";
+
+16) Execute o comando git add index.html e o comando git commit -m "Alterando o nome do curso de Kubernetes" para realizar um commit;
+
+17) Execute o comando git stash pop para trazer a última alteração da stash;
+
+18) Execute o comando git add index.html e o comando git commit -m "Alterando o nome do curso de Ansible" para realizar um commit;
+
+19) Execute o comando git push local master para enviar todas as suas alterações;
+
+20) Execute o comando git log --oneline para ver os commits de forma resumida. Copie o hash do commit de merge com a branch lista;
+
+21) Execute o comando git checkout {hash} substituindo {hash} pelo hash que você copiou;
+
+22) Veja que diversas alterações não estão mais presentes;
+
+23) Execute git checkout master para voltar à linha principal de desenvolvimento.
+
+Opinião do instrutor
+
+Continue com os seus estudos, e se houver dúvidas, não hesite em recorrer ao nosso fórum!
+
+@@08
+O que aprendemos?
+
+Nesta aula, aprendemos:
+Que o Git pode nos ajudar a desfazer alterações que não vamos utilizar;
+Que, para desfazer uma alteração antes de adicioná-la para commit (com git add), podemos utilizar o comando git checkout -- <arquivos>;
+Que, para desfazer uma alteração após adicioná-la para commit, antes precisamos executar o git reset HEAD <arquivos> e depois podemos desfazê-las com git checkout -- <arquivos>;
+Que, para revertermos as alterações realizadas em um commit, o comando git revert pode ser a solução;
+Que o comando git revert gera um novo commit informando que alterações foram desfeitas;
+Que, para guardar um trabalho para retomá-lo posteriormente, podemos utilizar o git stash;
+Que, para visualizar quais alterações estão na stash, podemos utilizar o comando git stash list;
+Que, com o comando git stash apply <numero>, podemos aplicar uma alteração específica da stash;
+Que o comando git stash drop <numero> remove determinado item da stash;
+Que o comando git stash pop aplica e remove a última alteração que foi adicionada na stash;
+Que o git checkout serve para deixar a cópia do código da nossa aplicação no estado que desejarmos:
+git checkout <branch> deixa o código no estado de uma branch com o nome <branch>;
+git checkout <hash> deixa o código no estado do commit com o hash <hash>.
